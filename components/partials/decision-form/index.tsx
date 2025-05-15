@@ -1,4 +1,5 @@
-import { AudioRecord, Emojis, File } from "@/components/icons";
+import { ArrowRight, AudioRecord, Emojis, File } from "@/components/icons";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import React from "react";
 
@@ -29,7 +30,7 @@ const DecisionForm = () => {
           />
           <div className="w-full flex justify-between">
             {/* icons */}
-            <div className="flex shrink-0 ">
+            <div className="flex shrink-0">
               <div className="p-2 cursor-pointer">
                 <File className="size-6 text-slate-600" />
               </div>
@@ -40,12 +41,13 @@ const DecisionForm = () => {
                 <AudioRecord className="size-6 text-slate-600" />
               </div>
             </div>
+            {/* button */}
+            <Button className="shrink-0" size="lg">
+              Next
+              <ArrowRight className="size-6" />
+            </Button>
           </div>
         </div>
-
-        {/* <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
-          Next →
-        </button> */}
       </div>
     </div>
   );
