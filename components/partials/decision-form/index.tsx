@@ -10,60 +10,77 @@ import { motion, AnimatePresence } from "framer-motion";
 import SubmitIcon from "@/components/icons/SubmitIcon";
 
 type FormData = {
-  decision: string;
+  oathStatement: string;
+  decisionReflection: string;
+  resistanceResponse: string;
 };
 
 const DecisionForm = () => {
   const [currentStep, helpers] = useStep(4);
   const { setStep } = helpers;
   const [direction, setDirection] = useState<"left" | "right">("right");
+  const [formData, setFormData] = useState<Partial<FormData>>({});
 
-  const { control, handleSubmit, watch, reset } = useForm<FormData>({
+  const { control, handleSubmit, watch, getValues } = useForm<FormData>({
     defaultValues: {
-      decision: "",
+      oathStatement: "",
+      decisionReflection: "",
+      resistanceResponse: "",
     },
   });
 
+  const currentFieldValue = watch(
+    currentStep === 1
+      ? "oathStatement"
+      : currentStep === 2
+      ? "decisionReflection"
+      : "resistanceResponse"
+  );
+
+  const handleNextStep = () => {
+    // Save current step data before proceeding
+    const values = getValues();
+    setFormData((prev) => ({
+      ...prev,
+      ...(currentStep === 1 && { oathStatement: values.oathStatement }),
+      ...(currentStep === 2 && {
+        decisionReflection: values.decisionReflection,
+      }),
+      ...(currentStep === 3 && {
+        resistanceResponse: values.resistanceResponse,
+      }),
+    }));
+
+    setDirection("right");
+    setStep(currentStep + 1);
+  };
+
   const onSubmit = (data: FormData) => {
-    console.log(data);
-    reset();
-    setStep(4);
+    // Combine all data for final submission
+    const completeData = {
+      ...formData,
+      resistanceResponse: data.resistanceResponse,
+    };
+
+    console.log("Form submitted with data:", completeData);
+
+    setStep(4); // Show summary
   };
-
-  const handleSteps = () => {
-    if (currentStep === 1) {
-      setDirection("right");
-      reset();
-      setStep(2);
-    }
-
-    if (currentStep === 2) {
-      setDirection("right");
-      reset();
-      setStep(3);
-    }
-  };
-
-  const decisionValue = watch("decision");
 
   // Animation variants
   const variants = {
-    enter: (direction: "left" | "right") => {
-      return {
-        x: direction === "right" ? 1000 : -1000,
-        opacity: 0,
-      };
-    },
+    enter: (direction: "left" | "right") => ({
+      x: direction === "right" ? 1000 : -1000,
+      opacity: 0,
+    }),
     center: {
       x: 0,
       opacity: 1,
     },
-    exit: (direction: "left" | "right") => {
-      return {
-        x: direction === "right" ? -1000 : 1000,
-        opacity: 0,
-      };
-    },
+    exit: (direction: "left" | "right") => ({
+      x: direction === "right" ? -1000 : 1000,
+      opacity: 0,
+    }),
   };
 
   return (
@@ -105,14 +122,19 @@ const DecisionForm = () => {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex flex-col gap-6 p-4 bg-white rounded-2xl">
                   <Controller
-                    name="decision"
+                    name={
+                      currentStep === 1
+                        ? "oathStatement"
+                        : currentStep === 2
+                        ? "decisionReflection"
+                        : "resistanceResponse"
+                    }
                     control={control}
                     render={({ field }) => (
                       <textarea
                         {...field}
                         className="w-full h-[84px] p-4 border-none rounded-lg mb-6 focus:outline-none text-slate-950 text-base font-semibold resize-none scroll-none overflow-hidden placeholder:text-slate-950 placeholder:text-base placeholder:font-semibold"
                         placeholder="Write here"
-                        value={field.value}
                       />
                     )}
                   />
@@ -125,17 +147,15 @@ const DecisionForm = () => {
                     <Button
                       className="shrink-0"
                       size="lg"
-                      type={[1, 2].includes(currentStep) ? "button" : "submit"}
-                      disabled={!decisionValue}
-                      onClick={
-                        [1, 2].includes(currentStep) ? handleSteps : undefined
-                      }
+                      type={currentStep === 3 ? "submit" : "button"}
+                      disabled={!currentFieldValue}
+                      onClick={currentStep !== 3 ? handleNextStep : undefined}
                     >
-                      {[1, 2].includes(currentStep) ? "Next" : "Submit"}
-                      {[1, 2].includes(currentStep) ? (
-                        <ArrowRight className="size-6" />
+                      {currentStep === 3 ? "Submit" : "Next"}
+                      {currentStep === 3 ? (
+                        <SubmitIcon className="size-6 ml-2" />
                       ) : (
-                        <SubmitIcon className="size-6" />
+                        <ArrowRight className="size-6 ml-2" />
                       )}
                     </Button>
                   </div>
@@ -171,7 +191,7 @@ const DecisionForm = () => {
                   </h5>
                 </div>
                 <div className="bg-slate-100 rounded-xl h-16 relative">
-                  <div className="bg-[linear-gradient(135deg,#B4FFB7_0%,#58DF5C_100%)] rounded-xl h-full w-4/5"></div>
+                  <div className="bg-gradient-to-r from-[#B4FFB7] to-[#58DF5C] rounded-xl h-full w-4/5"></div>
                   <div className="text-3xl font-bold text-slate-950 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                     80/100
                   </div>
