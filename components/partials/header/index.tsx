@@ -30,7 +30,7 @@ const Header = () => {
 
       {/* right */}
       <div className="flex items-center rounded-xl bg-slate-950/15 p-3 cursor-pointer">
-        <Hamberger className="w-8 h-8 text-white" />
+        <Hamberger className="size-6 text-white" />
       </div>
     </header>
   );
