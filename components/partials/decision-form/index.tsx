@@ -1,9 +1,45 @@
+"use client";
+
 import { ArrowRight, AudioRecord, Emojis, File } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import React from "react";
+import { useStep } from "usehooks-ts";
+import { useForm, Controller } from "react-hook-form";
+
+type FormData = {
+  decision: string;
+};
 
 const DecisionForm = () => {
+  const [currentStep, helpers] = useStep(2);
+  console.log("Current step:", currentStep);
+  const { setStep } = helpers;
+
+  const { control, handleSubmit, watch, reset } = useForm<FormData>({
+    defaultValues: {
+      decision: "",
+    },
+  });
+
+  const onSubmit = (data: FormData) => {
+    alert("Form submitted with data:" + JSON.stringify(data));
+    if (currentStep === 1) {
+      setStep(2);
+    }
+    reset();
+    setStep(1);
+  };
+
+  const handleSteps = () => {
+    if (currentStep === 1) {
+      reset();
+      setStep(2);
+    }
+  };
+
+  const decisionValue = watch("decision");
+
   return (
     <div
       className={`min-h-[calc(100vh-104px)] flex flex-col items-center justify-center`}
@@ -23,31 +59,52 @@ const DecisionForm = () => {
             values.
           </h1>
         </div>
-        <div className="flex flex-col gap-6 p-4 bg-white rounded-2xl">
-          <textarea
-            className="w-full h-[84px] p-4 border-none rounded-lg mb-6 focus:outline-none text-slate-950 text-base font-semibold resize-none scroll-none overflow-hidden placeholder:text-slate-950 placeholder:text-base placeholder:font-semibold"
-            placeholder="Write here"
-          />
-          <div className="w-full flex justify-between">
-            {/* icons */}
-            <div className="flex shrink-0">
-              <div className="p-2 cursor-pointer">
-                <File className="size-6 text-slate-600" />
+
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex flex-col gap-6 p-4 bg-white rounded-2xl">
+            <Controller
+              name="decision"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <textarea
+                    {...field}
+                    className="w-full h-[84px] p-4 border-none rounded-lg mb-6 focus:outline-none text-slate-950 text-base font-semibold resize-none scroll-none overflow-hidden placeholder:text-slate-950 placeholder:text-base placeholder:font-semibold"
+                    placeholder="Write here"
+                    value={field.value}
+                  />
+                </>
+              )}
+            />
+
+            <div className="w-full flex justify-between">
+              {/* icons */}
+              <div className="flex shrink-0">
+                <div className="p-2 cursor-pointer">
+                  <File className="size-6 text-slate-600" />
+                </div>
+                <div className="p-2 cursor-pointer">
+                  <Emojis className="size-6 text-slate-600" />
+                </div>
+                <div className="p-2 cursor-pointer">
+                  <AudioRecord className="size-6 text-slate-600" />
+                </div>
               </div>
-              <div className="p-2 cursor-pointer">
-                <Emojis className="size-6 text-slate-600" />
-              </div>
-              <div className="p-2 cursor-pointer">
-                <AudioRecord className="size-6 text-slate-600" />
-              </div>
+              {/* button */}
+              <Button
+                className="shrink-0"
+                size="lg"
+                type={currentStep === 1 ? "button" : "submit"}
+                disabled={!decisionValue}
+                onClick={currentStep === 1 ? handleSteps : undefined}
+              >
+                {currentStep === 1 ? "Next" : "Submit"}
+
+                <ArrowRight className="size-6" />
+              </Button>
             </div>
-            {/* button */}
-            <Button className="shrink-0" size="lg">
-              Next
-              <ArrowRight className="size-6" />
-            </Button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
