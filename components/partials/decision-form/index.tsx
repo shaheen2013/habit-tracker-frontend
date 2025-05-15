@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, AudioRecord, Emojis, File } from "@/components/icons";
+import { ArrowRight, Emojis } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import React, { useState } from "react";
@@ -118,16 +118,8 @@ const DecisionForm = () => {
                   />
 
                   <div className="w-full flex justify-between">
-                    <div className="flex shrink-0">
-                      <div className="p-2 cursor-pointer">
-                        <File className="size-6 text-slate-600" />
-                      </div>
-                      <div className="p-2 cursor-pointer">
-                        <Emojis className="size-6 text-slate-600" />
-                      </div>
-                      <div className="p-2 cursor-pointer">
-                        <AudioRecord className="size-6 text-slate-600" />
-                      </div>
+                    <div className="p-2 cursor-pointer shrink-0">
+                      <Emojis className="size-6 text-slate-600" />
                     </div>
 
                     <Button
