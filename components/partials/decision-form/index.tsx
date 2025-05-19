@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useStep } from "usehooks-ts";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,6 +22,7 @@ const DecisionForm = () => {
   );
   const [direction, setDirection] = useState<"left" | "right">("right");
   const [formData, setFormData] = useState<Partial<FormData>>({});
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const {
     control,
@@ -99,6 +100,13 @@ const DecisionForm = () => {
     }
   };
 
+  useEffect(() => {
+    // Focus the textarea when the step changes
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [currentStep]);
+
   return (
     <div
       className={`min-h-[calc(100vh-104px)] flex flex-col items-center justify-center`}
@@ -148,8 +156,7 @@ const DecisionForm = () => {
                       control={control}
                       rules={{
                         validate: {
-                          required: (value) =>
-                            !!value || "This field is required",
+                          required: (value) => !!value,
                           wordCount: (value) => {
                             const count = countWords(value || "");
                             if (currentStep === 1) {
@@ -169,8 +176,9 @@ const DecisionForm = () => {
                       render={({ field }) => (
                         <textarea
                           {...field}
+                          ref={textareaRef}
                           className={cn(
-                            "w-full h-[84px] p-4 border rounded-lg mb-1 focus:outline-none text-slate-950 text-base font-semibold resize-none scroll-none overflow-hidden placeholder:text-slate-950 placeholder:text-base placeholder:font-semibold",
+                            "w-full min-h-[84px] h-full max-h-[150px] p-4 border rounded-lg mb-1 focus:outline-none text-slate-950 text-base font-semibold resize-none scroll-none overflow-hidden placeholder:text-slate-950 placeholder:text-base placeholder:font-semibold",
                             errors[field.name]
                               ? "border-red-500"
                               : "border-none"
@@ -179,7 +187,7 @@ const DecisionForm = () => {
                         />
                       )}
                     />
-                    <div className="flex justify-between items-center mt-1">
+                    <div className="flex justify-between items-center">
                       {errors[
                         currentStep === 1
                           ? "oathStatement"
@@ -199,10 +207,6 @@ const DecisionForm = () => {
                           }
                         </span>
                       )}
-                      <span className="text-sm text-gray-500 ml-auto">
-                        {countWords(currentFieldValue || "")} words
-                        {currentStep === 1 ? " (1-50)" : " (20-50)"}
-                      </span>
                     </div>
                   </div>
 
