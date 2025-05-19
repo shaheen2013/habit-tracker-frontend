@@ -1,4 +1,4 @@
-const SubmitIcon = ({ className }: { className?: string }) => (
+const Submit = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -31,4 +31,4 @@ const SubmitIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export default SubmitIcon;
+export default Submit;

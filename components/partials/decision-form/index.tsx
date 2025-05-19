@@ -1,17 +1,19 @@
 "use client";
 
-import { ArrowRight, Emojis } from "@/components/icons";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import React, { useState } from "react";
-import { useStep } from "usehooks-ts";
 import { useForm, Controller } from "react-hook-form";
+import { useStep } from "usehooks-ts";
 import { motion, AnimatePresence } from "framer-motion";
-import SubmitIcon from "@/components/icons/SubmitIcon";
+
+import Image from "next/image";
+
 import { useEvaluateOathMutation } from "@/lib/api/evaluate.api";
-import ReflectionSummary from "@/components/partials/reflection-summary";
 import { FormData, responseType } from "./types";
 import { variants } from "./constants";
+
+import { ArrowRight, Emojis, Submit } from "@/components/icons";
+import { Button } from "@/components/ui/button";
+import ReflectionSummary from "@/components/partials/reflection-summary";
 
 const DecisionForm = () => {
   const [reflectionData, setReflectionData] = useState<responseType | null>(
@@ -148,7 +150,7 @@ const DecisionForm = () => {
                     >
                       {currentStep === 3 ? "Submit" : "Next"}
                       {currentStep === 3 ? (
-                        <SubmitIcon className="size-6 ml-2" />
+                        <Submit className="size-6 ml-2" />
                       ) : (
                         <ArrowRight className="size-6 ml-2" />
                       )}

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
+
 import { ReflectionSummarySkeleton } from "./skeletons";
 import { Props } from "./types";
 
