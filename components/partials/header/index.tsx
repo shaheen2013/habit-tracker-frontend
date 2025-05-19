@@ -1,8 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import { menus } from "./constant";
 import { Hamberger } from "@/components/icons";
 
 const Header = () => {
+  const handleLogoClick = () => {
+    // Will optimize this later
+    window.location.reload();
+  };
+
   return (
     <header
       className={`relative py-10 max-w-[1460px] mx-auto px-8 flex justify-between items-center max-h-[104px] h-full`}
@@ -24,6 +31,9 @@ const Header = () => {
       <Link
         href="/"
         className="absolute left-1/2 -translate-x-1/2 text-3xl font-black text-slate-950 "
+        aria-label="logo"
+        title="logo"
+        onClick={handleLogoClick}
       >
         Habit Tracker
       </Link>

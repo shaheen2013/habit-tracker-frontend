@@ -190,11 +190,22 @@ const DecisionForm = () => {
                     Alignment Score
                   </h5>
                 </div>
-                <div className="bg-slate-100 rounded-xl h-16 relative">
-                  <div className="bg-gradient-to-r from-[#B4FFB7] to-[#58DF5C] rounded-xl h-full w-4/5"></div>
-                  <div className="text-3xl font-bold text-slate-950 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+
+                <div className="bg-slate-100 rounded-xl h-16 relative overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: "80%" }}
+                    transition={{ duration: 1.5, ease: "easeInOut" }}
+                    className="bg-gradient-to-r from-[#B4FFB7] to-[#58DF5C] rounded-xl h-full"
+                  ></motion.div>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.5, duration: 0.5 }}
+                    className="text-3xl font-bold text-slate-950 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                  >
                     80/100
-                  </div>
+                  </motion.div>
                 </div>
               </div>
               <div className="p-4 bg-white rounded-2xl flex flex-col gap-2 mb-4">
