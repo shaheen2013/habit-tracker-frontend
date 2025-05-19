@@ -8,14 +8,16 @@ import { useStep } from "usehooks-ts";
 import { useForm, Controller } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import SubmitIcon from "@/components/icons/SubmitIcon";
-
-type FormData = {
-  oathStatement: string;
-  decisionReflection: string;
-  resistanceResponse: string;
-};
+import { useEvaluateOathMutation } from "@/lib/api/evaluate.api";
+import ReflectionSummary from "@/components/partials/reflection-summary";
+import { FormData, responseType } from "./types";
 
 const DecisionForm = () => {
+  const [reflectionData, setReflectionData] = useState<responseType | null>(
+    null
+  );
+
+  const [evaluateOath, { isLoading }] = useEvaluateOathMutation();
   const [currentStep, helpers] = useStep(4);
   const { setStep } = helpers;
   const [direction, setDirection] = useState<"left" | "right">("right");
@@ -55,16 +57,24 @@ const DecisionForm = () => {
     setStep(currentStep + 1);
   };
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     // Combine all data for final submission
-    const completeData = {
-      ...formData,
-      resistanceResponse: data.resistanceResponse,
+    const payload = {
+      oath: formData.oathStatement,
+      answer1: data.decisionReflection,
+      answer2: data.resistanceResponse,
     };
 
-    console.log("Form submitted with data:", completeData);
+    console.log("Form submitted with data:", payload);
 
-    setStep(4); // Show summary
+    setStep(4);
+
+    try {
+      const response = await evaluateOath(payload).unwrap();
+      setReflectionData(response);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   // Animation variants
@@ -164,85 +174,10 @@ const DecisionForm = () => {
             </div>
           )}
           {currentStep === 4 && (
-            <div className="bg-[#FAF4FF] rounded-4xl shadow-[0px_0px_0px_4px_#F6F1F9] p-8 border-4 border-white">
-              <div className="flex gap-6 items-center mb-6">
-                <Image
-                  src="/sparkle.svg"
-                  alt="sparkle"
-                  width={64}
-                  height={64}
-                  className="size-16 object-cover object-center aspect-square"
-                />
-                <h2 className="text-[40px] leading-12 font-extrabold text-slate-950">
-                  Today’s Reflection Summary
-                </h2>
-              </div>
-              <div className="p-4 bg-white rounded-2xl flex flex-col gap-2 mb-4">
-                <div className="flex gap-2 items-center">
-                  <Image
-                    src="/fast-charging.svg"
-                    alt="fast charging"
-                    width={32}
-                    height={32}
-                    className="size-8 object-cover object-center aspect-square"
-                  />
-                  <h5 className="text-2xl font-semibold text-slate-950">
-                    Alignment Score
-                  </h5>
-                </div>
-
-                <div className="bg-slate-100 rounded-xl h-16 relative overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: "80%" }}
-                    transition={{ duration: 1.5, ease: "easeInOut" }}
-                    className="bg-gradient-to-r from-[#B4FFB7] to-[#58DF5C] rounded-xl h-full"
-                  ></motion.div>
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.5, duration: 0.5 }}
-                    className="text-3xl font-bold text-slate-950 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                  >
-                    80/100
-                  </motion.div>
-                </div>
-              </div>
-              <div className="p-4 bg-white rounded-2xl flex flex-col gap-2 mb-4">
-                <div className="flex gap-2 items-center">
-                  <Image
-                    src="/summary.svg"
-                    alt="Summary"
-                    width={32}
-                    height={32}
-                    className="size-8 object-cover object-center aspect-square"
-                  />
-                  <h5 className="text-2xl font-semibold text-slate-950">
-                    Summary
-                  </h5>
-                </div>
-                <p className="text-2xl font-semibold text-slate-950">
-                  You showed consistent alignment with your stated values.
-                </p>
-              </div>
-              <div className="p-4 bg-white rounded-2xl flex flex-col gap-2 mb-4">
-                <div className="flex gap-2 items-center">
-                  <Image
-                    src="/flag.svg"
-                    alt="Flag"
-                    width={32}
-                    height={32}
-                    className="size-8 object-cover object-center aspect-square"
-                  />
-                  <h5 className="text-2xl font-semibold text-slate-950">
-                    Flag
-                  </h5>
-                </div>
-                <p className="text-2xl font-semibold text-slate-950">
-                  Mild defensiveness noted in response to emotional resistance.
-                </p>
-              </div>
-            </div>
+            <ReflectionSummary
+              reflectionData={reflectionData}
+              loading={isLoading}
+            />
           )}
         </motion.div>
       </AnimatePresence>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
+import ReduxProvider from "@/lib/redux/provider";
 
 const geistNunito = Nunito({
   variable: "--font-geist-nunito",
@@ -20,7 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistNunito.variable} antialiased`}>{children}</body>
+      <body className={`${geistNunito.variable} antialiased`}>
+        <ReduxProvider>{children}</ReduxProvider>
+      </body>
     </html>
   );
 }
