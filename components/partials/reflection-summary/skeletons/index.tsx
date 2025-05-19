@@ -1,10 +1,19 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 export function ReflectionSummarySkeleton() {
   return (
     <div className="bg-[#FAF4FF] rounded-4xl shadow-[0px_0px_0px_4px_#F6F1F9] p-8 border-4 border-white">
       <div className="flex gap-6 items-center mb-6">
-        <Skeleton className="size-16 rounded-full" />
-        <Skeleton className="h-12 w-64 rounded-xl" />
+        <Image
+          src="/sparkle.svg"
+          alt="sparkle"
+          width={64}
+          height={64}
+          className="size-16 object-cover object-center aspect-square"
+        />
+        <h2 className="text-[40px] leading-12 font-extrabold text-slate-950">
+          Today’s Reflection Summary
+        </h2>
       </div>
 
       {/* Alignment Score Section */}

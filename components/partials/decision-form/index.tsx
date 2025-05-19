@@ -14,6 +14,7 @@ import { variants } from "./constants";
 import { ArrowRight, Emojis, Submit } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import ReflectionSummary from "@/components/partials/reflection-summary";
+import { cn, countWords } from "@/lib/utils";
 
 const DecisionForm = () => {
   const [reflectionData, setReflectionData] = useState<responseType | null>(
@@ -22,12 +23,20 @@ const DecisionForm = () => {
   const [direction, setDirection] = useState<"left" | "right">("right");
   const [formData, setFormData] = useState<Partial<FormData>>({});
 
-  const { control, handleSubmit, watch, getValues } = useForm<FormData>({
+  const {
+    control,
+    handleSubmit,
+    watch,
+    getValues,
+    formState: { errors },
+    trigger,
+  } = useForm<FormData>({
     defaultValues: {
       oathStatement: "",
       decisionReflection: "",
       resistanceResponse: "",
     },
+    mode: "onChange",
   });
 
   const [evaluateOath, { isLoading }] = useEvaluateOathMutation();
@@ -42,7 +51,19 @@ const DecisionForm = () => {
       : "resistanceResponse"
   );
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
+    const fieldName =
+      currentStep === 1
+        ? "oathStatement"
+        : currentStep === 2
+        ? "decisionReflection"
+        : "resistanceResponse";
+
+    // Trigger validation for the current field
+    const isValid = await trigger(fieldName);
+
+    if (!isValid) return;
+
     // Save current step data before proceeding
     const values = getValues();
     setFormData((prev) => ({
@@ -67,8 +88,6 @@ const DecisionForm = () => {
       answer1: data.decisionReflection,
       answer2: data.resistanceResponse,
     };
-
-    console.log("Form submitted with data:", payload);
 
     setStep(4);
 
@@ -110,7 +129,6 @@ const DecisionForm = () => {
                   {currentStep === 1 && "Please enter your oath statement"}
                   {currentStep === 2 &&
                     "Describe one decision you made today that reflects your personal values."}
-
                   {currentStep === 3 &&
                     "Where did you face resistance today, and how did you respond?"}
                 </h1>
@@ -118,23 +136,75 @@ const DecisionForm = () => {
 
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex flex-col gap-6 p-4 bg-white rounded-2xl">
-                  <Controller
-                    name={
-                      currentStep === 1
-                        ? "oathStatement"
-                        : currentStep === 2
-                        ? "decisionReflection"
-                        : "resistanceResponse"
-                    }
-                    control={control}
-                    render={({ field }) => (
-                      <textarea
-                        {...field}
-                        className="w-full h-[84px] p-4 border-none rounded-lg mb-6 focus:outline-none text-slate-950 text-base font-semibold resize-none scroll-none overflow-hidden placeholder:text-slate-950 placeholder:text-base placeholder:font-semibold"
-                        placeholder="Write here"
-                      />
-                    )}
-                  />
+                  <div className="relative">
+                    <Controller
+                      name={
+                        currentStep === 1
+                          ? "oathStatement"
+                          : currentStep === 2
+                          ? "decisionReflection"
+                          : "resistanceResponse"
+                      }
+                      control={control}
+                      rules={{
+                        validate: {
+                          required: (value) =>
+                            !!value || "This field is required",
+                          wordCount: (value) => {
+                            const count = countWords(value || "");
+                            if (currentStep === 1) {
+                              return (
+                                (count >= 1 && count <= 50) ||
+                                "Must be 1-50 words"
+                              );
+                            } else {
+                              return (
+                                (count >= 20 && count <= 50) ||
+                                "Must be 20-50 words"
+                              );
+                            }
+                          },
+                        },
+                      }}
+                      render={({ field }) => (
+                        <textarea
+                          {...field}
+                          className={cn(
+                            "w-full h-[84px] p-4 border rounded-lg mb-1 focus:outline-none text-slate-950 text-base font-semibold resize-none scroll-none overflow-hidden placeholder:text-slate-950 placeholder:text-base placeholder:font-semibold",
+                            errors[field.name]
+                              ? "border-red-500"
+                              : "border-none"
+                          )}
+                          placeholder="Write here"
+                        />
+                      )}
+                    />
+                    <div className="flex justify-between items-center mt-1">
+                      {errors[
+                        currentStep === 1
+                          ? "oathStatement"
+                          : currentStep === 2
+                          ? "decisionReflection"
+                          : "resistanceResponse"
+                      ] && (
+                        <span className="text-red-500 text-sm">
+                          {
+                            errors[
+                              currentStep === 1
+                                ? "oathStatement"
+                                : currentStep === 2
+                                ? "decisionReflection"
+                                : "resistanceResponse"
+                            ]?.message
+                          }
+                        </span>
+                      )}
+                      <span className="text-sm text-gray-500 ml-auto">
+                        {countWords(currentFieldValue || "")} words
+                        {currentStep === 1 ? " (1-50)" : " (20-50)"}
+                      </span>
+                    </div>
+                  </div>
 
                   <div className="w-full flex justify-between">
                     <div className="p-2 cursor-pointer shrink-0">
@@ -145,7 +215,16 @@ const DecisionForm = () => {
                       className="shrink-0"
                       size="lg"
                       type={currentStep === 3 ? "submit" : "button"}
-                      disabled={!currentFieldValue}
+                      disabled={
+                        !currentFieldValue ||
+                        !!errors[
+                          currentStep === 1
+                            ? "oathStatement"
+                            : currentStep === 2
+                            ? "decisionReflection"
+                            : "resistanceResponse"
+                        ]
+                      }
                       onClick={currentStep !== 3 ? handleNextStep : undefined}
                     >
                       {currentStep === 3 ? "Submit" : "Next"}
