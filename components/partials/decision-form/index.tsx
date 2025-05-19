@@ -19,10 +19,6 @@ const DecisionForm = () => {
   const [reflectionData, setReflectionData] = useState<responseType | null>(
     null
   );
-
-  const [evaluateOath, { isLoading }] = useEvaluateOathMutation();
-  const [currentStep, helpers] = useStep(4);
-  const { setStep } = helpers;
   const [direction, setDirection] = useState<"left" | "right">("right");
   const [formData, setFormData] = useState<Partial<FormData>>({});
 
@@ -33,6 +29,10 @@ const DecisionForm = () => {
       resistanceResponse: "",
     },
   });
+
+  const [evaluateOath, { isLoading }] = useEvaluateOathMutation();
+  const [currentStep, helpers] = useStep(4);
+  const { setStep } = helpers;
 
   const currentFieldValue = watch(
     currentStep === 1
