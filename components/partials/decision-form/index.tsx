@@ -11,6 +11,7 @@ import SubmitIcon from "@/components/icons/SubmitIcon";
 import { useEvaluateOathMutation } from "@/lib/api/evaluate.api";
 import ReflectionSummary from "@/components/partials/reflection-summary";
 import { FormData, responseType } from "./types";
+import { variants } from "./constants";
 
 const DecisionForm = () => {
   const [reflectionData, setReflectionData] = useState<responseType | null>(
@@ -75,22 +76,6 @@ const DecisionForm = () => {
     } catch (error) {
       console.error("Error submitting form:", error);
     }
-  };
-
-  // Animation variants
-  const variants = {
-    enter: (direction: "left" | "right") => ({
-      x: direction === "right" ? 1000 : -1000,
-      opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: "left" | "right") => ({
-      x: direction === "right" ? -1000 : 1000,
-      opacity: 0,
-    }),
   };
 
   return (
