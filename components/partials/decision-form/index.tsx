@@ -100,6 +100,13 @@ const DecisionForm = () => {
     }
   };
 
+  const autoResize = (el: HTMLElement | null) => {
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = el.scrollHeight + "px";
+    }
+  };
+
   useEffect(() => {
     // Focus the textarea when the step changes
     if (textareaRef.current) {
@@ -176,9 +183,13 @@ const DecisionForm = () => {
                       render={({ field }) => (
                         <textarea
                           {...field}
-                          ref={textareaRef}
+                          ref={(el) => {
+                            textareaRef.current = el;
+                            autoResize(el);
+                          }}
+                          onInput={(e) => autoResize(e.target as HTMLElement)}
                           className={cn(
-                            "w-full min-h-[84px] h-full max-h-[150px] p-4 border rounded-lg mb-1 focus:outline-none text-slate-950 text-base font-semibold resize-none scroll-none overflow-hidden placeholder:text-slate-950 placeholder:text-base placeholder:font-semibold",
+                            "w-full min-h-[84px] h-full max-h-[calc(100vh-500px)] p-4 border rounded-lg mb-1 focus:outline-none text-slate-950 text-base font-semibold resize-none overflow-hidden placeholder:text-slate-950 placeholder:text-base placeholder:font-semibold",
                             errors[field.name]
                               ? "border-red-500"
                               : "border-none"
